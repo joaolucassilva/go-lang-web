@@ -4,9 +4,6 @@
 
 .idea
 
-# CMake
-cmake-build-*/
-
 # mpeltonen/sbt-idea plugin
 .idea_modules/
 
