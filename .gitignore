@@ -4,6 +4,12 @@
 
 .idea
 
+<<<<<<< HEAD
+=======
+# CMake
+cmake-build-*/
+
+>>>>>>> main
 # mpeltonen/sbt-idea plugin
 .idea_modules/
 
@@ -37,4 +43,8 @@ fabric.properties
 # vendor/
 
 # Go workspace file
+<<<<<<< HEAD
 go.work
+=======
+go.work
+>>>>>>> main
