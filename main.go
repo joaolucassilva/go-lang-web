@@ -17,6 +17,7 @@ func conectaComBancoDeDados() *sql.DB {
 }
 
 type Produto struct {
+	Id         int
 	Nome       string
 	Descricao  string
 	Preco      float64
@@ -26,8 +27,6 @@ type Produto struct {
 var templates = template.Must(template.ParseGlob("templates/*.html"))
 
 func main() {
-	db := conectaComBancoDeDados()
-	defer db.Close()
 	http.HandleFunc("/", index)
 	err := http.ListenAndServe(":8000", nil)
 	if err != nil {
@@ -36,15 +35,37 @@ func main() {
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
-	produtos := []Produto{
-		{Nome: "Notebook", Descricao: "Notebook Dell", Preco: 3000.0, Quantidade: 10},
-		{Nome: "Mouse", Descricao: "Mouse Gamer", Preco: 100.0, Quantidade: 20},
-		{Nome: "Teclado", Descricao: "Teclado Gamer", Preco: 200.0, Quantidade: 30},
-		{Nome: "Monitor", Descricao: "Monitor Gamer", Preco: 500.0, Quantidade: 40},
-		{Nome: "Headset", Descricao: "Headset Gamer", Preco: 300.0, Quantidade: 50},
+	db := conectaComBancoDeDados()
+	selectDeTodosOsProdutos, err := db.Query("SELECT * FROM produtos")
+	if err != nil {
+		panic(err.Error())
 	}
 
-	err := templates.ExecuteTemplate(w, "Index", produtos)
+	p := Produto{}
+	produtos := []Produto{}
+
+	for selectDeTodosOsProdutos.Next() {
+		var id int
+		var nome, descricao string
+		var preco float64
+		var quantidade int
+
+		err := selectDeTodosOsProdutos.Scan(&id, &nome, &descricao, &preco, &quantidade)
+		if err != nil {
+			panic(err.Error())
+		}
+
+		p.Id = id
+		p.Nome = nome
+		p.Descricao = descricao
+		p.Preco = preco
+		p.Quantidade = quantidade
+		produtos = append(produtos, p)
+	}
+
+	err = templates.ExecuteTemplate(w, "Index", produtos)
+	defer db.Close()
+
 	if err != nil {
 		return
 	}
